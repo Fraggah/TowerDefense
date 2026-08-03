@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Crossbow_Visuals : MonoBehaviour
 {
-    private Tower_Crossbow myTower;
+    private Enemy myEnemy;
 
     [SerializeField] private LineRenderer attackVisuals;
     [SerializeField] private float attackVisualDuration = .1f;
@@ -20,23 +20,77 @@ public class Crossbow_Visuals : MonoBehaviour
     [SerializeField] private Color startColor;
     [SerializeField] private Color endColor;
 
+    [Header("Rotor Visuals")]
+    [SerializeField] private Transform rotor;
+    [SerializeField] private Transform rotorUnloaded;
+    [SerializeField] private Transform rotorLoaded;
+
+
+    [Header("Front Glow String")]
+    [SerializeField] private LineRenderer string_FL;
+    [SerializeField] private LineRenderer string_FR;
+
+    [Space]
+
+    [SerializeField] private Transform startPoint_FL;
+    [SerializeField] private Transform startPoint_FR;
+    [SerializeField] private Transform endPoint_FL;
+    [SerializeField] private Transform endPoint_FR;
+
+    [Header("Back Glow String")]
+    [SerializeField] private LineRenderer string_BL;
+    [SerializeField] private LineRenderer string_BR;
+
+    [Space]
+
+    [SerializeField] private Transform startPoint_BL;
+    [SerializeField] private Transform startPoint_BR;
+    [SerializeField] private Transform endPoint_BL;
+    [SerializeField] private Transform endPoint_BR;
+
+    [SerializeField] private LineRenderer[] lineRenderers;
+
     private void Awake()
     {
-        myTower = GetComponent<Tower_Crossbow>();
-
         material = new Material(meshRenderer.material);
-
         meshRenderer.material = material;
+
+        UpdateMaterialsOnLineRenderers();
         StartCoroutine(ChangeEmission(1));
     }
-    public void PlayAttackVFX(Vector3 startPoint, Vector3 endPoint)
+
+    private void UpdateMaterialsOnLineRenderers()
     {
-        StartCoroutine(VFXCoroutine(startPoint, endPoint));
+        foreach (var lr in lineRenderers)
+        {
+            lr.material = material;
+        }
     }
+
+
 
     private void Update()
     {
         UpdateEmissionColor();
+        UpdateStrings();
+
+        UpdateAttackVisualsIfNeeded();
+    }
+
+    private void UpdateAttackVisualsIfNeeded()
+    {
+        if (attackVisuals.enabled && myEnemy != null)
+        {
+            attackVisuals.SetPosition(1, myEnemy.CenterPoint());
+        }
+    }
+
+    private void UpdateStrings()
+    {
+        UpdateStringVisual(string_FL, startPoint_FL, endPoint_FL);
+        UpdateStringVisual(string_FR, startPoint_FR, endPoint_FR);
+        UpdateStringVisual(string_BL, startPoint_BL, endPoint_BL);
+        UpdateStringVisual(string_BR, startPoint_BR, endPoint_BR);
     }
 
     private void UpdateEmissionColor()
@@ -48,14 +102,21 @@ public class Crossbow_Visuals : MonoBehaviour
         material.SetColor("_EmissionColor", emissionColor);
     }
 
-    public void PlayReloadFX(float duration)
+    public void PlayReloadVFX(float duration)
     {
-        StartCoroutine(ChangeEmission(duration / 2));
+        float newDuration = duration / 2;
+
+        StartCoroutine(ChangeEmission(newDuration));
+        StartCoroutine(UpdateRotorPosition(newDuration));
+    }
+    public void PlayAttackVFX(Vector3 startPoint, Vector3 endPoint, Enemy newEnemy)
+    {
+        StartCoroutine(VFXCoroutine(startPoint, endPoint, newEnemy));
     }
 
-    private IEnumerator VFXCoroutine(Vector3 startPoint, Vector3 endPoint)
+    private IEnumerator VFXCoroutine(Vector3 startPoint, Vector3 endPoint, Enemy newEnemy)
     {
-        myTower.EnableRotation(false);
+        myEnemy = newEnemy;
 
         attackVisuals.enabled = true;
         attackVisuals.SetPosition(0, startPoint);
@@ -64,7 +125,6 @@ public class Crossbow_Visuals : MonoBehaviour
         yield return new WaitForSeconds(attackVisualDuration);
 
         attackVisuals.enabled = false;
-        myTower.EnableRotation(true);
     }
 
     private IEnumerator ChangeEmission(float duration)
@@ -80,5 +140,25 @@ public class Crossbow_Visuals : MonoBehaviour
         }
 
         currentIntensity = maxIntensity;
+    }
+
+    private IEnumerator UpdateRotorPosition(float duration)
+    {
+        float startTime = Time.time;
+
+        while(Time.time - startTime < duration)
+        {
+            float tValue = (Time.time - startTime) / duration;
+            rotor.position = Vector3.Lerp(rotorUnloaded.position, rotorLoaded.position, tValue);
+            yield return null;
+        }
+
+        rotor.position = rotorLoaded.position;
+    }
+
+    private void UpdateStringVisual(LineRenderer lineRenderer, Transform startPoint, Transform endPoint)
+    {
+        lineRenderer.SetPosition(0, startPoint.position);
+        lineRenderer.SetPosition(1, endPoint.position);
     }
 }
