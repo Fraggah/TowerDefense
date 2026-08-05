@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3176168243896322164}
   - component: {fileID: 3998541433886072575}
+  - component: {fileID: 5193974892506209922}
   - component: {fileID: 3948662936884659200}
   - component: {fileID: 8107756082988983290}
   - component: {fileID: 3552059368450380736}
@@ -49,10 +50,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d844aa0bd0b68c948a6276d954d6f164, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  enemyType: 0
   centerPoint: {fileID: 8760008009685505591}
   healthPoints: 4
   turnSpeed: 10
-  waypoints: []
+  myWaypoints: []
+--- !u!114 &5193974892506209922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55302653710635342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85a90cf1f2022b947bfb516a1d3387fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy_Visuals
+  visuals: {fileID: 5065608194322130826}
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
+  verticalRotationSpeed: 5
 --- !u!195 &3948662936884659200
 NavMeshAgent:
   m_ObjectHideFlags: 0
