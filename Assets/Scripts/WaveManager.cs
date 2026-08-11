@@ -13,6 +13,8 @@ public class WaveDetails
 
 public class WaveManager : MonoBehaviour
 {
+    private UI_InGame inGameUI;
+
     [SerializeField] private GridBuilder currentGrid;
     public bool waveCompleted;
 
@@ -34,6 +36,7 @@ public class WaveManager : MonoBehaviour
     private void Awake()
     {
         enemyPortals = new List<EnemyPortal>(FindObjectsByType<EnemyPortal>(FindObjectsSortMode.None));
+        inGameUI = FindAnyObjectByType<UI_InGame>();
     }
 
     private void Start()
@@ -57,6 +60,7 @@ public class WaveManager : MonoBehaviour
 
             waveCompleted = true;
             waveTimer = timeBeetwenWaves;
+            inGameUI.EnableWaveTimer(true);
         }
     }
 
@@ -65,9 +69,11 @@ public class WaveManager : MonoBehaviour
         if (waveCompleted)
         {
             waveTimer -= Time.deltaTime;
+            inGameUI.UpdateWaveTimerUI(waveTimer);
 
             if (waveTimer <= 0)
             {
+                inGameUI.EnableWaveTimer(false);
                 SetupNextWave();
             }
         }
@@ -76,6 +82,8 @@ public class WaveManager : MonoBehaviour
     public void ForceNextWave()
     {
         if (AllEnemiesDefeated() == false) return;
+
+        inGameUI.EnableWaveTimer(false);
         SetupNextWave();
     }
 
