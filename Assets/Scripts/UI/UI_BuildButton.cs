@@ -1,0 +1,109 @@
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler
+{
+    private UI ui;
+    private BuildManager buildManager;
+    private CameraEffects cameraEffects;
+    private GameManager gameManager;
+    private UI_BuildButtonsHolder buildButtonsHolder;
+    private UI_BuildButtonOnHoverEffect onHoverEffect;
+
+    [SerializeField] private string towerName;
+    [SerializeField] private int towerPrice = 50;
+    [Space]
+    [SerializeField] private GameObject towerToBuild;
+    [SerializeField] private float towerCenterY = .5f;
+    [Header("Text Components")]
+    [SerializeField] private TextMeshProUGUI towerNameText;
+    [SerializeField] private TextMeshProUGUI towerPriceText;
+
+    private TowerPreview towerPreview;
+    public bool buttonUnlocked {  get; private set; }
+
+    private void Awake()
+    {
+        ui = GetComponentInParent<UI>();
+        onHoverEffect = GetComponent<UI_BuildButtonOnHoverEffect>();
+        buildButtonsHolder = GetComponentInParent<UI_BuildButtonsHolder>();
+
+        buildManager = FindAnyObjectByType<BuildManager>();
+        cameraEffects = FindAnyObjectByType<CameraEffects>();
+        gameManager = FindAnyObjectByType<GameManager>();
+    }
+
+    private void Start()
+    {
+        CreateTowerPreview();
+    }
+
+    private void CreateTowerPreview()
+    {
+        GameObject newPreview = Instantiate(towerToBuild, Vector2.zero, Quaternion.identity);
+
+        towerPreview = newPreview.AddComponent<TowerPreview>();
+        towerPreview.gameObject.SetActive(false);
+    }
+
+    public void SelectButton(bool select)
+    {
+        BuildSlot slotToUse = buildManager.GetSelectedSlot();
+
+        if (slotToUse == null) return;
+
+        Vector3 previewPosition = slotToUse.GetBuildPosition(1);
+
+        towerPreview.gameObject.SetActive(select);
+        towerPreview.ShowPreview(select, previewPosition);
+        onHoverEffect.ShowCaseButton(select);
+        buildButtonsHolder.SetLastSelected(this);
+    }
+
+    public void UnlockTowerIfNeeded(string towerNameToCheck, bool unlockStatus)
+    {
+        if (towerNameToCheck != towerName) return;
+
+        buttonUnlocked = unlockStatus;
+        gameObject.SetActive(unlockStatus);
+    }
+
+    public void BuildTower()
+    {
+        if (gameManager.HasEnoughCurrency(towerPrice) == false)
+        {
+            ui.inGameUI.ShakeCurrencyUI();
+            return;
+        }
+
+        if (towerToBuild == null) return;
+
+        BuildSlot slotToUse = buildManager.GetSelectedSlot();
+        buildManager.CancelBuildAction();
+
+        slotToUse.SnapToDefaulPositionImmidiatly();
+        slotToUse.SetSlotAvalibleTo(false);
+
+        cameraEffects.Screenshake(.15f, .02f);
+
+        GameObject newTower = Instantiate(towerToBuild, slotToUse.GetBuildPosition(towerCenterY),Quaternion.identity);
+    }
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        foreach (var button in buildButtonsHolder.GetBuildButtons())
+        {
+            button.SelectButton(false);
+        }
+
+        SelectButton(true);
+    }
+
+    private void OnValidate()
+    {
+        towerNameText.text = towerName;
+        towerPriceText.text = towerPrice + "";
+        gameObject.name = "BuildButton_UI - " + towerName;
+    }
+
+}

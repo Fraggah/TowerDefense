@@ -9,6 +9,8 @@ public class UI_InGame : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI healthPointsText;
     [SerializeField] private TextMeshProUGUI currencyText;
+    private Vector3 healthTextOriginalPos;
+    private Vector3 currencyTextOriginalPos;
     [Space]
     [SerializeField] private TextMeshProUGUI waveTimerText;
     [SerializeField] private float waveTimerOffset;
@@ -21,10 +23,28 @@ public class UI_InGame : MonoBehaviour
         pauseUI = ui.GetComponentInChildren<UI_Pause>(true);
     }
 
+    private void Start()
+    {
+        RectTransform hpRectTransform = healthPointsText.transform.parent.GetComponent<RectTransform>();
+        healthTextOriginalPos = hpRectTransform.anchoredPosition;
+        RectTransform currencyRectTransform = currencyText.transform.parent.GetComponent<RectTransform>();
+        currencyTextOriginalPos = currencyRectTransform.anchoredPosition;
+    }
+
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if(Input.GetKeyDown(KeyCode.F10))
             ui.SwitchTo(pauseUI.gameObject);
+    }
+
+    public void ShakeCurrencyUI()
+    {
+        ui.uiAnim.Shake(currencyText.transform.parent, currencyTextOriginalPos);
+    }
+
+    public void ShakeHealthUI()
+    {
+        ui.uiAnim.Shake(healthPointsText.transform.parent, healthTextOriginalPos);
     }
 
     public void UpdateHealthPointsUI(int value, int maxValue)

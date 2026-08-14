@@ -4,6 +4,33 @@ using UnityEngine.UI;
 
 public class UI_Animator : MonoBehaviour
 {
+    [Header("UI Feedback -Shake Effect")]
+    [SerializeField] private float shakeMagnitude;
+    [SerializeField] private float shakeDuration;
+
+    public void Shake(Transform transformToShake, Vector3 originalPos)
+    {
+        RectTransform rectTransform = transformToShake.GetComponent<RectTransform>();
+        StartCoroutine(ShakeCo(rectTransform, originalPos));
+    }
+
+    private IEnumerator ShakeCo(RectTransform rectTransform, Vector3 originalPos)
+    {
+        float time = 0;
+        while (time < shakeDuration)
+        {
+            float xOffset = Random.Range(-shakeDuration, shakeMagnitude);
+            float yOffset = Random.Range(-shakeDuration, shakeMagnitude);
+
+            rectTransform.anchoredPosition = originalPos + new Vector3(xOffset, yOffset);
+
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        rectTransform.anchoredPosition = originalPos;
+    }
+
     public void ChangePosition(Transform transform, Vector3 offset, float duration = .3f)
     {
         RectTransform rectTransform = transform.GetComponent<RectTransform>();

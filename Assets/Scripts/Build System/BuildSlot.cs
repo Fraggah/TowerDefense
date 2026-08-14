@@ -1,0 +1,99 @@
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class BuildSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
+{
+    private UI ui;
+    private TileAnimator tileAnim;
+    private BuildManager buildManager;
+    private Vector3 defaultPosition;
+
+    private bool tileCanBeMoved = true;
+    private bool buildSlotAvalible = true;
+
+    private Coroutine moveToDefaultCo;
+    private Coroutine currentMovementUpCo;
+
+    private void Awake()
+    {
+        ui = FindAnyObjectByType<UI>();
+        tileAnim = FindAnyObjectByType<TileAnimator>();
+        buildManager = FindAnyObjectByType<BuildManager>();
+        defaultPosition = transform.position;
+    }
+
+    private void Start()
+    {
+        if (buildSlotAvalible == false)
+            transform.position += new Vector3(0, .1f);
+    }
+
+    public void SetSlotAvalibleTo(bool value) => buildSlotAvalible = value;
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (buildSlotAvalible == false) return;
+
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        if (buildManager.GetSelectedSlot() == this) return;
+
+        buildManager.EnableBuildMenu();
+        buildManager.SelectBuildSlot(this);
+        MoveTileUp();
+
+        tileCanBeMoved = false;
+
+        ui.buildButtonsUI.GetLastSelectedButton()?.SelectButton(true);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (buildSlotAvalible == false) return;
+
+        if (tileCanBeMoved == false) return; 
+
+        MoveTileUp();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (buildSlotAvalible == false) return;
+
+        if (tileCanBeMoved == false) return;
+
+        if (currentMovementUpCo != null)
+        {
+            Invoke(nameof(MoveToDefaultPosition), tileAnim.GetTravelDuration());
+        }
+        else
+            MoveToDefaultPosition();
+    }
+
+    public void UnselectTile()
+    {
+        MoveToDefaultPosition();
+        tileCanBeMoved = true;
+    }
+
+    private void MoveTileUp()
+    {
+        Vector3 targetPosition = transform.position + new Vector3(0, tileAnim.GetBuildOffset(), 0);
+        currentMovementUpCo = StartCoroutine(tileAnim.MoveTileCo(transform, targetPosition));
+    }
+
+    private void MoveToDefaultPosition()
+    {
+        moveToDefaultCo = StartCoroutine(tileAnim.MoveTileCo(transform, defaultPosition));
+    }
+
+    public void SnapToDefaulPositionImmidiatly()
+    {
+        if(moveToDefaultCo != null)
+            StopCoroutine(moveToDefaultCo);
+
+        transform.position = defaultPosition;
+    }
+
+    public Vector3 GetBuildPosition(float yOffset) => defaultPosition + new Vector3(0, yOffset);
+}
