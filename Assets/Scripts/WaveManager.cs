@@ -16,21 +16,21 @@ public class WaveManager : MonoBehaviour
     private UI_InGame inGameUI;
 
     [SerializeField] private GridBuilder currentGrid;
-    public bool waveCompleted;
 
-    public float timeBeetwenWaves = 10;
-    public float waveTimer;
+    [Header ("Wave Details")]
+    [SerializeField] private float timeBeetwenWaves = 10;
+    [SerializeField] private float waveTimer;
     [SerializeField] private WaveDetails[] levelWaves;
-    private int waveIndex;
-
-    private float checkInterval = .5f;
-    private float nextCheckTime;
+    [SerializeField] private int waveIndex;
 
     [Header("Enemy Prefabs")]
     [SerializeField] private GameObject basicEnemy;
     [SerializeField] private GameObject fastEnemy;
 
     private List<EnemyPortal> enemyPortals;
+    private bool waveTimerEnabled;
+    private bool makingNextWave;
+    public bool gameBegun;
 
     [System.Obsolete]
     private void Awake()
@@ -39,61 +39,54 @@ public class WaveManager : MonoBehaviour
         inGameUI = FindAnyObjectByType<UI_InGame>();
     }
 
-    private void Start()
-    {
-        SetupNextWave();
-    }
-
     private void Update()
     {
-        HandleWaveCompletion();
-        HandleWaveTiming();
+        if (gameBegun == false) return;
+        HandleWaveTimer();
+    }
+
+    [ContextMenu("Activate Wave Manager")]
+    public void ActivateWaveManager()
+    {
+        gameBegun = true;
+        EnableWaveTimer(true);
     }
 
     public WaveDetails[] GetLevelWaves() => levelWaves;
 
-    private void HandleWaveCompletion()
+    public void CheckIfWaveCompleted()
     {
-        if (ReadyToCheck() == false) return;
+        if (AllEnemiesDefeated() == false || makingNextWave) return;
 
-        if (waveCompleted == false && AllEnemiesDefeated())
-        {
-            CheckForNewLevelLayout();
+        makingNextWave = true;
 
-            waveCompleted = true;
-            waveTimer = timeBeetwenWaves;
-            inGameUI.EnableWaveTimer(true);
-        }
+        CheckForNewLevelLayout();
+        EnableWaveTimer(true);
     }
 
-    private void HandleWaveTiming()
+    private void HandleWaveTimer()
     {
-        if (waveCompleted)
-        {
-            waveTimer -= Time.deltaTime;
-            inGameUI.UpdateWaveTimerUI(waveTimer);
+        if (waveTimerEnabled == false) return;
 
-            if (waveTimer <= 0)
-            {
-                inGameUI.EnableWaveTimer(false);
-                SetupNextWave();
-            }
-        }
+        waveTimer -= Time.deltaTime;
+        inGameUI.UpdateWaveTimerUI(waveTimer);
+
+        if (waveTimer <= 0)
+            StartNewWave();
     }
 
-    public void ForceNextWave()
+    public void StartNewWave()
     {
-        if (AllEnemiesDefeated() == false) return;
-
-        inGameUI.EnableWaveTimer(false);
-        SetupNextWave();
+        waveIndex++;
+        GiveEnemiesToPortals();
+        EnableWaveTimer(false);
+        makingNextWave = false;
     }
 
-    [ContextMenu("Setup Next Wave")]
-    private void SetupNextWave()
+    private void GiveEnemiesToPortals()
     {
 
-        List<GameObject> newEnemies = NewEnemyWave();
+        List<GameObject> newEnemies = GetNewEnemies();
         int portalIndex = 0;
 
         if (newEnemies == null) return;
@@ -112,32 +105,6 @@ public class WaveManager : MonoBehaviour
                 portalIndex = 0;
             }
         }
-
-        waveCompleted = false;
-    }
-
-    private List<GameObject> NewEnemyWave()
-    {
-        if (waveIndex >= levelWaves.Length)
-        {
-            return null;
-        }
-
-        List<GameObject> newEnemyList = new List<GameObject>();
-
-        for (int i = 0; i < levelWaves[waveIndex].basicEnemy; i++)
-        {
-            newEnemyList.Add(basicEnemy);
-        }
-
-        for (int i = 0; i < levelWaves[waveIndex].fastEnemy; i++)
-        {
-            newEnemyList.Add(fastEnemy);
-        }
-
-        waveIndex++;
-
-        return newEnemyList;
     }
 
     private void CheckForNewLevelLayout()
@@ -183,13 +150,45 @@ public class WaveManager : MonoBehaviour
         }
     }
 
+    private void EnableWaveTimer(bool enable)
+    {
+        if (waveTimerEnabled == enable) return;
+
+        waveTimer = timeBeetwenWaves;
+        waveTimerEnabled = enable;
+        inGameUI.EnableWaveTimer(enable);
+    }
+
     private void EnableNewPortals(EnemyPortal[] newPortals)
     {
         foreach (EnemyPortal portal in newPortals)
         {
+            portal.AssingWaveManager(this);
             portal.gameObject.SetActive(true);
             enemyPortals.Add(portal);
         }
+    }
+
+    private List<GameObject> GetNewEnemies()
+    {
+        if (waveIndex >= levelWaves.Length)
+        {
+            return null;
+        }
+
+        List<GameObject> newEnemyList = new List<GameObject>();
+
+        for (int i = 0; i < levelWaves[waveIndex].basicEnemy; i++)
+        {
+            newEnemyList.Add(basicEnemy);
+        }
+
+        for (int i = 0; i < levelWaves[waveIndex].fastEnemy; i++)
+        {
+            newEnemyList.Add(fastEnemy);
+        }
+
+        return newEnemyList;
     }
 
     private bool AllEnemiesDefeated()
@@ -199,15 +198,5 @@ public class WaveManager : MonoBehaviour
             if (portal.GetActiveEnemies().Count > 0) return false;
         }
         return true;
-    }
-
-    private bool ReadyToCheck()
-    {
-        if (Time.time >= nextCheckTime)
-        {
-            nextCheckTime = Time.time + checkInterval;
-            return true;
-        }
-        return false;
     }
 }

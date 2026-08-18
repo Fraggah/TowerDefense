@@ -19500,6 +19500,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -864504943501375902, guid: 83f9c09298c5582408f0f6a9b08f27a0, type: 3}
+      propertyPath: myWaveManager
+      value: 
+      objectReference: {fileID: 1411620835}
+    - target: {fileID: -864504943501375902, guid: 83f9c09298c5582408f0f6a9b08f27a0, type: 3}
       propertyPath: spawnCooldown
       value: 0.5
       objectReference: {fileID: 0}
@@ -99299,7 +99303,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   currentGrid: {fileID: 1703487953}
-  waveCompleted: 0
   timeBeetwenWaves: 10
   waveTimer: 0
   levelWaves:
@@ -99312,8 +99315,10 @@ MonoBehaviour:
     - {fileID: 1046574918}
     basicEnemy: 0
     fastEnemy: 15
+  waveIndex: 0
   basicEnemy: {fileID: 55302653710635342, guid: 2dd7af0e079f00d499516f79397ef9fe, type: 3}
   fastEnemy: {fileID: 4434078641962963817, guid: 05a2a231127d2b84d9ae37f53240d153, type: 3}
+  gameBegun: 0
 --- !u!4 &1411620836
 Transform:
   m_ObjectHideFlags: 0
@@ -114167,6 +114172,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -864504943501375902, guid: 83f9c09298c5582408f0f6a9b08f27a0, type: 3}
+      propertyPath: myWaveManager
+      value: 
+      objectReference: {fileID: 1411620835}
     - target: {fileID: -864504943501375902, guid: 83f9c09298c5582408f0f6a9b08f27a0, type: 3}
       propertyPath: spawnCooldown
       value: 0.5
