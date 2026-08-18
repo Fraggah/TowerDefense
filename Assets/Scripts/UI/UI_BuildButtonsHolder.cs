@@ -23,9 +23,43 @@ public class UI_BuildButtonsHolder : MonoBehaviour
         buildButtons = GetComponentsInChildren<UI_BuildButton>();
     }
 
+    private void Update()
+    {
+        CheckBuildButtonsHotkeys();
+    }
+
+    private void CheckBuildButtonsHotkeys()
+    {
+        if (isBuildMenuActive == false) return;
+
+        for (int i = 0; i < unlockedButtons.Count; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                SelectNewButton(i);
+                break;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            lastSelectedButton.BuildTower();
+    }
+
+    public void SelectNewButton(int buttonIndex)
+    {
+        if (buttonIndex >= unlockedButtons.Count) return;
+
+        foreach (var button in unlockedButtons)
+        {
+            button.SelectButton(false);
+        }
+
+        UI_BuildButton selectedButton = unlockedButtons[buttonIndex];
+        selectedButton.SelectButton(true);
+    }
+
     public UI_BuildButton[] GetBuildButtons() => buildButtons;
     public List<UI_BuildButton> GetUnlockedButtons() => unlockedButtons;
-
     public void SetLastSelected(UI_BuildButton newLastSelected) => lastSelectedButton = newLastSelected;
     public UI_BuildButton GetLastSelectedButton() => lastSelectedButton;
 

@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler
+public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private UI ui;
     private BuildManager buildManager;
@@ -78,6 +78,7 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler
         }
 
         if (towerToBuild == null) return;
+        if (ui.buildButtonsUI.GetLastSelectedButton() == null) return;
 
         BuildSlot slotToUse = buildManager.GetSelectedSlot();
         buildManager.CancelBuildAction();
@@ -85,18 +86,28 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler
         slotToUse.SnapToDefaulPositionImmidiatly();
         slotToUse.SetSlotAvalibleTo(false);
 
+        ui.buildButtonsUI.SetLastSelected(null);
+
         cameraEffects.Screenshake(.15f, .02f);
 
         GameObject newTower = Instantiate(towerToBuild, slotToUse.GetBuildPosition(towerCenterY),Quaternion.identity);
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
+        buildManager.MouseOverUI(true);
+
         foreach (var button in buildButtonsHolder.GetBuildButtons())
         {
-            button.SelectButton(false);
+            if(button.gameObject.activeSelf)
+                button.SelectButton(false);
         }
 
         SelectButton(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        buildManager.MouseOverUI(false);
     }
 
     private void OnValidate()

@@ -503,7 +503,6 @@ MonoBehaviour:
   adjustmentSpeed: 10
   showcaseY: 160
   defaultY: 120
-  selectedY: 0
 --- !u!222 &5075830034251584012
 CanvasRenderer:
   m_ObjectHideFlags: 0
