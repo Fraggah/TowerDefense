@@ -98823,7 +98823,7 @@ GameObject:
   - component: {fileID: 1398456314}
   - component: {fileID: 1398456313}
   m_Layer: 0
-  m_Name: '***TileManager***'
+  m_Name: '***TileAnimator***'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -99316,6 +99316,8 @@ MonoBehaviour:
     basicEnemy: 0
     fastEnemy: 15
   waveIndex: 0
+  yOffset: 5
+  tileDelay: 0.1
   basicEnemy: {fileID: 55302653710635342, guid: 2dd7af0e079f00d499516f79397ef9fe, type: 3}
   fastEnemy: {fileID: 4434078641962963817, guid: 05a2a231127d2b84d9ae37f53240d153, type: 3}
   gameBegun: 0
