@@ -1,27 +1,90 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TileAnimator : MonoBehaviour
 {
-    [SerializeField] private float yMovementDuration = .1f;
+    [SerializeField] private float defaultMoveDuration = .1f;
 
     [Header("Build Slot Movement")]
     [SerializeField] private float buildSlotYOffset = .25f;
 
-    public void MoveTile(Transform objectToMove, Vector3 targetPosition)
+    [Header("Grid Animation Details")]
+    [SerializeField] private float tileMoveDuration = .1f;
+    [SerializeField] private float tileDelay = .1f;
+    [SerializeField] private float yOffset = 5;
+
+    [Space]
+    [SerializeField] private List<GameObject> mainMenuObjects = new List<GameObject>();
+    [SerializeField] private GridBuilder mainSceneGrid;
+    private bool isGridMoving;
+
+    [System.Obsolete]
+    private void Start()
     {
-        StartCoroutine(MoveTileCo(objectToMove, targetPosition));
+        CollectMainSceneObjects();
+        ShowGrid(mainSceneGrid, true);
     }
 
-    public IEnumerator MoveTileCo(Transform objectToMove, Vector3 targetPosition)
+    [System.Obsolete]
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.J)) BringUpMainGrid(true);
+        if (Input.GetKeyDown(KeyCode.K)) BringUpMainGrid(false);
+    }
+
+    [System.Obsolete]
+    public void BringUpMainGrid(bool showMainGrid)
+    {
+        ShowGrid(mainSceneGrid, showMainGrid);
+    }
+
+    [System.Obsolete]
+    public void ShowGrid(GridBuilder gridToMove, bool showGrid)
+    {
+        List<GameObject> objectsToMove = GetObjectsToMove(gridToMove, showGrid);
+
+        if(gridToMove.IsOnFirstLoad())
+            ApplyOffset(objectsToMove, new Vector3(0, -yOffset, 0));
+
+        float offset = showGrid ? yOffset : -yOffset;
+
+        StartCoroutine(MoveGridCo(objectsToMove, offset));
+    }
+
+    private IEnumerator MoveGridCo(List<GameObject> objectsToMove, float yOffset)
+    {
+        isGridMoving = true;
+
+        for (int i = 0; i < objectsToMove.Count; i++)
+        {
+            yield return new WaitForSeconds(tileDelay);
+
+            Transform tile = objectsToMove[i].transform;
+            Vector3 targetPosition = tile.position + new Vector3(0, yOffset, 0);
+
+            MoveTile(tile, targetPosition, tileMoveDuration);
+        }
+
+        isGridMoving = false;
+    }
+
+    public void MoveTile(Transform objectToMove, Vector3 targetPosition, float? newDuration = null)
+    {
+        float duration = newDuration ?? defaultMoveDuration;
+        StartCoroutine(MoveTileCo(objectToMove, targetPosition, duration));
+    }
+
+    public IEnumerator MoveTileCo(Transform objectToMove, Vector3 targetPosition, float? newDuration = null)
     {
         float time = 0;
         Vector3 startPosition = objectToMove.position;
+        float duration = newDuration ?? defaultMoveDuration;
 
-        while (time < yMovementDuration)
+        while (time < duration)
         {
-            objectToMove.position = Vector3.Lerp(startPosition, targetPosition, time / yMovementDuration);
+            objectToMove.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
             
             time += Time.deltaTime;
             yield return null;
@@ -30,6 +93,61 @@ public class TileAnimator : MonoBehaviour
         objectToMove.position = targetPosition;
     }
 
+    private void ApplyOffset(List<GameObject> objectsToMove, Vector3 offset)
+    {
+        foreach (var obj in objectsToMove)
+        {
+            obj.transform.position += offset;
+        }
+    }
+
+    public void EnableMainSceneObjects(bool enable)
+    {
+        foreach (var obj in mainMenuObjects)
+        {
+            obj.SetActive(enable);
+        }
+    }
+
+    [System.Obsolete]
+    private void CollectMainSceneObjects()
+    {
+        mainMenuObjects.AddRange(mainSceneGrid.GetTileSetup());
+        mainMenuObjects.AddRange(GetExtraObjects());
+    }
+
+    [System.Obsolete]
+    private List<GameObject> GetObjectsToMove(GridBuilder gridToMove, bool startWithTiles)
+    {
+        List<GameObject> objectsToMove = new List<GameObject>();
+        List<GameObject> extraObjects = GetExtraObjects();
+
+        if (startWithTiles)
+        {
+            objectsToMove.AddRange(gridToMove.GetTileSetup());
+            objectsToMove.AddRange(extraObjects);
+        }
+        else
+        {
+            objectsToMove.AddRange(extraObjects);
+            objectsToMove.AddRange(gridToMove.GetTileSetup());
+        }
+
+        return objectsToMove;
+    }
+
+    [System.Obsolete]
+    private List<GameObject> GetExtraObjects()
+    {
+        List<GameObject> extraObjects = new List<GameObject>();
+
+        extraObjects.AddRange(FindObjectsOfType<EnemyPortal>().Select(component => component.gameObject));
+        extraObjects.AddRange(FindObjectsOfType<Castle>().Select(component => component.gameObject));
+
+        return extraObjects;
+    }
+
     public float GetBuildOffset() => buildSlotYOffset;
-    public float GetTravelDuration() => yMovementDuration;
+    public float GetTravelDuration() => defaultMoveDuration;
+    public bool IsGridMoving() => isGridMoving;
 }

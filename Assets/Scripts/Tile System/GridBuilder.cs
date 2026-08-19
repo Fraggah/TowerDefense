@@ -10,6 +10,18 @@ public class GridBuilder : MonoBehaviour
     [SerializeField] private int gridLength = 10;
     [SerializeField] private int gridWidth = 10;
 
+    private bool hadFirstLoad;
+
+    public bool IsOnFirstLoad()
+    {
+        if (hadFirstLoad == false)
+        {
+            hadFirstLoad = true;
+            return true;
+        }
+        return false;
+    }
+
     public List<GameObject> GetTileSetup()
     {
         List<GameObject> tiles = new List<GameObject>();
