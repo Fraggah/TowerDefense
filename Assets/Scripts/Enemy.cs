@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Xml.Schema;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,7 +18,6 @@ public class Enemy : MonoBehaviour , IDamagable
     [SerializeField] private float turnSpeed = 10;
 
     [SerializeField] private List<Transform> myWaypoints;
-
     private int nextWaypointIndex;
     private int currentWaypointIndex;
 
@@ -32,10 +29,10 @@ public class Enemy : MonoBehaviour , IDamagable
         agent.updateRotation = false;
         agent.avoidancePriority = Mathf.RoundToInt(agent.speed * 10);
 
-        gameManager = FindAnyObjectByType<GameManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
     }
 
-    public void SetupEnemy(List<Waypoint> newWaypoints, EnemyPortal myNewPortal)
+    public void SetupEnemy(List<Waypoint> newWaypoints,EnemyPortal myNewPortal)
     {
         myWaypoints = new List<Transform>();
 
@@ -48,37 +45,42 @@ public class Enemy : MonoBehaviour , IDamagable
 
         myPortal = myNewPortal;
     }
+   
 
     private void Update()
     {
         FaceTarget(agent.steeringTarget);
 
         // Check if the agent is close to current target point
-        if(ShouldChengeWaypoint())
+        if (ShouldChangeWaypoint())
         {
             // Set the destination to the next waypoint
             agent.SetDestination(GetNextWaypoint());
         }
     }
 
-    private bool ShouldChengeWaypoint()
-    {
-        if(nextWaypointIndex >= myWaypoints.Count) return false;
 
-        if (agent.remainingDistance < .5f) return true;
+    private bool ShouldChangeWaypoint()
+    {
+        if (nextWaypointIndex >= myWaypoints.Count)
+            return false;
+
+        if (agent.remainingDistance < .5f)
+            return true;
 
         Vector3 currentWaypoint = myWaypoints[currentWaypointIndex].position;
         Vector3 nextWaypoint = myWaypoints[nextWaypointIndex].position;
 
         float distanceToNextWaypoint = Vector3.Distance(transform.position, nextWaypoint);
-        float distanceBeetwenPoints = Vector3.Distance(currentWaypoint, nextWaypoint);
+        float distnaceBeetwenPoints = Vector3.Distance(currentWaypoint, nextWaypoint);
 
-        return distanceBeetwenPoints > distanceToNextWaypoint;
+        
+        return distnaceBeetwenPoints > distanceToNextWaypoint;
     }
 
-    public float DistanceToTheFinishLine() => totalDistance + agent.remainingDistance;
+    public float DistanceToFinishLine() => totalDistance + agent.remainingDistance;
 
-    private void CollectTotalDistance()
+     private void CollectTotalDistance()
     {
         for (int i = 0; i < myWaypoints.Count - 1; i++)
         {
@@ -91,12 +93,11 @@ public class Enemy : MonoBehaviour , IDamagable
     {
         // Calculate the direction from current position to the new target
         Vector3 directionToTarget = newTarget - transform.position;
-        if (directionToTarget.magnitude == 0) return;
-        directionToTarget.y = 0; //Ignore any diference in the vertical position // Removes vertical component
+        directionToTarget.y = 0; // Ignore any diffrence in the vertical position // Removes vertical component
 
         Quaternion newRotation = Quaternion.LookRotation(directionToTarget);
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, turnSpeed* Time.deltaTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, turnSpeed * Time.deltaTime);
     }
 
     private Vector3 GetNextWaypoint()
@@ -104,8 +105,10 @@ public class Enemy : MonoBehaviour , IDamagable
         // Check if the waypoint index is beyond the last waypoint
         if (nextWaypointIndex >= myWaypoints.Count)
         {
-            //If true, return the agent's current position, effectively stopping it
-            return transform.position;  
+            // If true, return the agent's current position, effectively stopping it
+            // Uncomment the line below to loop the waypoints
+            // waypointIndex = 0;
+            return transform.position;
         }
 
         // Get the current target point from the waypoints array
@@ -115,24 +118,27 @@ public class Enemy : MonoBehaviour , IDamagable
         if (nextWaypointIndex > 0)
         {
             float distance = Vector3.Distance(myWaypoints[nextWaypointIndex].position, myWaypoints[nextWaypointIndex - 1].position);
-            //Subtract this distance from the total distance
+            // Subtract this distance from the total distance
             totalDistance = totalDistance - distance;
         }
 
+        // Increment the waypoint index to move to the next waypoint on the next call
         nextWaypointIndex = nextWaypointIndex + 1;
-        currentWaypointIndex = nextWaypointIndex - 1;
+        currentWaypointIndex = nextWaypointIndex - 1; // Assign current waypoint index
 
+        // Return the current target point
         return targetPoint;
     }
 
     public Vector3 CenterPoint() => centerPoint.position;
     public EnemyType GetEnemyType() => enemyType;
-
+    
     public void TakeDamage(int damage)
     {
         healthPoints = healthPoints - damage;
 
-        if (healthPoints <= 0) Die();
+        if (healthPoints <= 0)
+            Die();
     }
 
     private void Die()

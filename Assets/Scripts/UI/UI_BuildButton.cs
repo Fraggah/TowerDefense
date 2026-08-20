@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,6 +13,7 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private UI_BuildButtonsHolder buildButtonsHolder;
     private UI_BuildButtonOnHoverEffect onHoverEffect;
 
+
     [SerializeField] private string towerName;
     [SerializeField] private int towerPrice = 50;
     [Space]
@@ -20,8 +23,10 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField] private TextMeshProUGUI towerNameText;
     [SerializeField] private TextMeshProUGUI towerPriceText;
 
-    private TowerPreview towerPreview;
-    public bool buttonUnlocked {  get; private set; }
+
+    //It is used to preview tower before building it
+    public TowerPreview towerPreview;
+    public bool buttonUnlocked { get; private set; }
 
     private void Awake()
     {
@@ -29,9 +34,9 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         onHoverEffect = GetComponent<UI_BuildButtonOnHoverEffect>();
         buildButtonsHolder = GetComponentInParent<UI_BuildButtonsHolder>();
 
-        buildManager = FindAnyObjectByType<BuildManager>();
-        cameraEffects = FindAnyObjectByType<CameraEffects>();
-        gameManager = FindAnyObjectByType<GameManager>();
+        buildManager = FindFirstObjectByType<BuildManager>();
+        cameraEffects = FindFirstObjectByType<CameraEffects>(); 
+        gameManager = FindFirstObjectByType<GameManager>();
     }
 
     private void Start()
@@ -41,7 +46,7 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void CreateTowerPreview()
     {
-        GameObject newPreview = Instantiate(towerToBuild, Vector2.zero, Quaternion.identity);
+        GameObject newPreview = Instantiate(towerToBuild,Vector3.zero, Quaternion.identity);
 
         towerPreview = newPreview.AddComponent<TowerPreview>();
         towerPreview.gameObject.SetActive(false);
@@ -51,19 +56,22 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         BuildSlot slotToUse = buildManager.GetSelectedSlot();
 
-        if (slotToUse == null) return;
+        if (slotToUse == null)
+            return;
 
         Vector3 previewPosition = slotToUse.GetBuildPosition(1);
 
+
         towerPreview.gameObject.SetActive(select);
         towerPreview.ShowPreview(select, previewPosition);
-        onHoverEffect.ShowCaseButton(select);
+        onHoverEffect.ShowcaseButton(select);
         buildButtonsHolder.SetLastSelected(this);
     }
 
     public void UnlockTowerIfNeeded(string towerNameToCheck, bool unlockStatus)
     {
-        if (towerNameToCheck != towerName) return;
+        if (towerNameToCheck != towerName)
+            return;
 
         buttonUnlocked = unlockStatus;
         gameObject.SetActive(unlockStatus);
@@ -77,21 +85,29 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             return;
         }
 
-        if (towerToBuild == null) return;
-        if (ui.buildButtonsUI.GetLastSelectedButton() == null) return;
+        if (towerToBuild == null)
+        {
+            Debug.LogWarning("You did not assign tower to this button!");
+            return;
+        }
+
+        if (ui.buildButtonsUI.GetLastSelectedButton() == null)
+            return;
 
         BuildSlot slotToUse = buildManager.GetSelectedSlot();
         buildManager.CancelBuildAction();
 
-        slotToUse.SnapToDefaulPositionImmidiatly();
+        slotToUse.SnapToDefaultPositionImmidiatly();
         slotToUse.SetSlotAvalibleTo(false);
 
         ui.buildButtonsUI.SetLastSelected(null);
 
         cameraEffects.Screenshake(.15f, .02f);
 
-        GameObject newTower = Instantiate(towerToBuild, slotToUse.GetBuildPosition(towerCenterY),Quaternion.identity);
+        GameObject newTower = Instantiate(towerToBuild,slotToUse.GetBuildPosition(towerCenterY),Quaternion.identity);
     }
+
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         buildManager.MouseOverUI(true);

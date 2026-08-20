@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -6,6 +8,8 @@ public class UI_TextBlinkEffect : MonoBehaviour
     private TextMeshProUGUI myText;
 
     [SerializeField] private float changeValueSpeed;
+    [SerializeField] private float currentValue;
+    [SerializeField] private float targetValue;
     private float targetAlpha;
     private bool canBlink;
 
@@ -16,9 +20,10 @@ public class UI_TextBlinkEffect : MonoBehaviour
 
     private void Update()
     {
-        if (canBlink == false) return;
+        if (canBlink == false)
+            return;
 
-        if(Mathf.Abs(myText.color.a - targetAlpha) > .01f)
+        if (Mathf.Abs(myText.color.a - targetAlpha) > .01f)
         {
             float newAlpha = Mathf.Lerp(myText.color.a, targetAlpha, changeValueSpeed * Time.deltaTime);
             ChangeColorAlpha(newAlpha);
@@ -33,7 +38,8 @@ public class UI_TextBlinkEffect : MonoBehaviour
     {
         canBlink = enable;
 
-        if (canBlink == false) ChangeColorAlpha(1);
+        if (canBlink == false)
+            ChangeColorAlpha(1);
     }
 
     private void ChangeTargetAlpha() => targetAlpha = (targetAlpha == 1) ? 0 : 1;
@@ -41,6 +47,6 @@ public class UI_TextBlinkEffect : MonoBehaviour
     private void ChangeColorAlpha(float newAlpha)
     {
         Color myColor = myText.color;
-        myText.color = new Color(myColor.r, myColor.g, myColor.b, newAlpha);
+        myText.color = new Color(myColor.r,myColor.g, myColor.b, newAlpha);
     }
 }

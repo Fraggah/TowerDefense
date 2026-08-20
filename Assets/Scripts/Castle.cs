@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Castle : MonoBehaviour
@@ -10,7 +13,7 @@ public class Castle : MonoBehaviour
         {
             other.GetComponent<Enemy>().DestroyEnemy();
 
-            if (gameManager == null)
+            if(gameManager == null)
                 gameManager = FindAnyObjectByType<GameManager>();
 
             if (gameManager != null)

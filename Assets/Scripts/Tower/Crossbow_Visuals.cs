@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Crossbow_Visuals : MonoBehaviour
@@ -8,45 +9,44 @@ public class Crossbow_Visuals : MonoBehaviour
     [SerializeField] private LineRenderer attackVisuals;
     [SerializeField] private float attackVisualDuration = .1f;
 
+
     [Header("Glowing Visuals")]
     [SerializeField] private MeshRenderer meshRenderer;
     private Material material;
 
     [Space]
-    private float currentIntensity;
     [SerializeField] private float maxIntensity = 150;
-
+    private float currentIntensity;
     [Space]
     [SerializeField] private Color startColor;
     [SerializeField] private Color endColor;
+
 
     [Header("Rotor Visuals")]
     [SerializeField] private Transform rotor;
     [SerializeField] private Transform rotorUnloaded;
     [SerializeField] private Transform rotorLoaded;
 
-
     [Header("Front Glow String")]
-    [SerializeField] private LineRenderer string_FL;
-    [SerializeField] private LineRenderer string_FR;
+    [SerializeField] private LineRenderer frontString_L;
+    [SerializeField] private LineRenderer frontString_R;
 
     [Space]
 
-    [SerializeField] private Transform startPoint_FL;
-    [SerializeField] private Transform startPoint_FR;
-    [SerializeField] private Transform endPoint_FL;
-    [SerializeField] private Transform endPoint_FR;
+    [SerializeField] private Transform frontStartPoint_L;
+    [SerializeField] private Transform frontStartPoint_R;
+    [SerializeField] private Transform frontEndPoint_L;
+    [SerializeField] private Transform frontEndPoint_R;
 
     [Header("Back Glow String")]
-    [SerializeField] private LineRenderer string_BL;
-    [SerializeField] private LineRenderer string_BR;
+    [SerializeField] private LineRenderer backString_L;
+    [SerializeField] private LineRenderer backString_R;
 
     [Space]
-
-    [SerializeField] private Transform startPoint_BL;
-    [SerializeField] private Transform startPoint_BR;
-    [SerializeField] private Transform endPoint_BL;
-    [SerializeField] private Transform endPoint_BR;
+    [SerializeField] private Transform backStartPoint_L;
+    [SerializeField] private Transform backStartPoint_R;
+    [SerializeField] private Transform backEndPoint_L;
+    [SerializeField] private Transform backEndPoint_R;
 
     [SerializeField] private LineRenderer[] lineRenderers;
 
@@ -67,30 +67,25 @@ public class Crossbow_Visuals : MonoBehaviour
         }
     }
 
-
-
     private void Update()
     {
         UpdateEmissionColor();
         UpdateStrings();
-
         UpdateAttackVisualsIfNeeded();
     }
 
     private void UpdateAttackVisualsIfNeeded()
     {
         if (attackVisuals.enabled && myEnemy != null)
-        {
             attackVisuals.SetPosition(1, myEnemy.CenterPoint());
-        }
     }
 
     private void UpdateStrings()
     {
-        UpdateStringVisual(string_FL, startPoint_FL, endPoint_FL);
-        UpdateStringVisual(string_FR, startPoint_FR, endPoint_FR);
-        UpdateStringVisual(string_BL, startPoint_BL, endPoint_BL);
-        UpdateStringVisual(string_BR, startPoint_BR, endPoint_BR);
+        UpdateStringVisual(frontString_L, frontStartPoint_L, frontEndPoint_L);
+        UpdateStringVisual(frontString_R, frontStartPoint_R, frontEndPoint_R);
+        UpdateStringVisual(backString_L, backStartPoint_L, backEndPoint_L);
+        UpdateStringVisual(backString_R, backStartPoint_R, backEndPoint_R);
     }
 
     private void UpdateEmissionColor()
@@ -102,19 +97,20 @@ public class Crossbow_Visuals : MonoBehaviour
         material.SetColor("_EmissionColor", emissionColor);
     }
 
-    public void PlayReloadVFX(float duration)
+    public void PlayReloaxVFX(float duration)
     {
         float newDuration = duration / 2;
 
         StartCoroutine(ChangeEmission(newDuration));
         StartCoroutine(UpdateRotorPosition(newDuration));
     }
+
     public void PlayAttackVFX(Vector3 startPoint, Vector3 endPoint, Enemy newEnemy)
     {
-        StartCoroutine(VFXCoroutine(startPoint, endPoint, newEnemy));
+        StartCoroutine(VFXCoroutione(startPoint,endPoint,newEnemy));
     }
 
-    private IEnumerator VFXCoroutine(Vector3 startPoint, Vector3 endPoint, Enemy newEnemy)
+    private IEnumerator VFXCoroutione(Vector3 startPoint, Vector3 endPoint,Enemy newEnemy)
     {
         myEnemy = newEnemy;
 
@@ -123,17 +119,18 @@ public class Crossbow_Visuals : MonoBehaviour
         attackVisuals.SetPosition(1, endPoint);
 
         yield return new WaitForSeconds(attackVisualDuration);
-
         attackVisuals.enabled = false;
     }
 
     private IEnumerator ChangeEmission(float duration)
     {
-        float startTime = Time.time;
+        float startTime = Time.time; 
         float startIntensity = 0;
 
-        while (Time.time - startTime < duration)
+        // Do something repeatedly until the duration has passed
+        while (Time.time - startTime < duration) 
         {
+            // Calculates the proportion of the duration that has elapsed since the start of the coroutine.
             float tValue = (Time.time - startTime) / duration;
             currentIntensity = Mathf.Lerp(startIntensity, maxIntensity, tValue);
             yield return null;
@@ -146,7 +143,7 @@ public class Crossbow_Visuals : MonoBehaviour
     {
         float startTime = Time.time;
 
-        while(Time.time - startTime < duration)
+        while (Time.time - startTime < duration)
         {
             float tValue = (Time.time - startTime) / duration;
             rotor.position = Vector3.Lerp(rotorUnloaded.position, rotorLoaded.position, tValue);
@@ -159,6 +156,6 @@ public class Crossbow_Visuals : MonoBehaviour
     private void UpdateStringVisual(LineRenderer lineRenderer, Transform startPoint, Transform endPoint)
     {
         lineRenderer.SetPosition(0, startPoint.position);
-        lineRenderer.SetPosition(1, endPoint.position);
+        lineRenderer.SetPosition(1,endPoint.position);
     }
 }

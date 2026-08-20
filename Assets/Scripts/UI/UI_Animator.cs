@@ -4,40 +4,62 @@ using UnityEngine.UI;
 
 public class UI_Animator : MonoBehaviour
 {
-    [Header("UI Feedback -Shake Effect")]
+    [Header("UI Feedback - Shake Effect")]
     [SerializeField] private float shakeMagnitude;
     [SerializeField] private float shakeDuration;
+    [SerializeField] private float shakeRotationMagnitude;
+    [Space]
+    [SerializeField] private float defaultUIScale = 1.5f;
+    [SerializeField] private bool scaleChangeAvalible;
 
-    public void Shake(Transform transformToShake, Vector3 originalPos)
+    public void Shake(Transform transformToShake)
     {
         RectTransform rectTransform = transformToShake.GetComponent<RectTransform>();
-        StartCoroutine(ShakeCo(rectTransform, originalPos));
+        StartCoroutine(ShakeCo(rectTransform));
     }
 
-    private IEnumerator ShakeCo(RectTransform rectTransform, Vector3 originalPos)
+    private IEnumerator ShakeCo(RectTransform rectTransform)
     {
         float time = 0;
+        Vector3 originalPosition = rectTransform.anchoredPosition;
+        float currentScale = rectTransform.localScale.x;
+
+        if (scaleChangeAvalible)
+            StartCoroutine(ChangeScaleCo(rectTransform, currentScale * 1.1f, shakeDuration / 2));
+
         while (time < shakeDuration)
         {
-            float xOffset = Random.Range(-shakeDuration, shakeMagnitude);
-            float yOffset = Random.Range(-shakeDuration, shakeMagnitude);
+            float xOffset = Random.Range(-shakeMagnitude, shakeMagnitude);
+            float yOffset = Random.Range(-shakeMagnitude, shakeMagnitude);
+            float randomRotation = Random.Range(-shakeRotationMagnitude, shakeRotationMagnitude);
 
-            rectTransform.anchoredPosition = originalPos + new Vector3(xOffset, yOffset);
+            rectTransform.anchoredPosition = originalPosition + new Vector3(xOffset, yOffset);
+            rectTransform.localRotation = Quaternion.Euler(0,0,randomRotation);
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        rectTransform.anchoredPosition = originalPos;
+        rectTransform.anchoredPosition = originalPosition;
+        rectTransform.localRotation = Quaternion.Euler(Vector3.zero);
+
+        if(scaleChangeAvalible)
+            StartCoroutine(ChangeScaleCo(rectTransform, defaultUIScale, shakeDuration / 2));
+            
     }
 
-    public void ChangePosition(Transform transform, Vector3 offset, float duration = .3f)
+
+
+
+    public void ChangePosition(Transform transform, Vector3 offset, float duration = .1f)
     {
         RectTransform rectTransform = transform.GetComponent<RectTransform>();
-        StartCoroutine(ChangePositionCo(rectTransform, offset, duration));
+
+        StartCoroutine(ChangePositionCo(rectTransform, offset,  duration));
     }
 
-    private IEnumerator ChangePositionCo( RectTransform rectTransform, Vector3 offset, float duration)
+
+    public IEnumerator ChangePositionCo(RectTransform rectTransform, Vector3 offset, float duration = .1f)
     {
         float time = 0;
 
@@ -46,11 +68,7 @@ public class UI_Animator : MonoBehaviour
 
         while (time < duration)
         {
-            float t = time / duration;
-            t = Mathf.SmoothStep(0, 1, t);
-
-            rectTransform.anchoredPosition = Vector3.Lerp(initialPosition, targetPosition, t);
-
+            rectTransform.anchoredPosition = Vector3.Lerp(initialPosition, targetPosition, time / duration);
             time += Time.deltaTime;
 
             yield return null;
@@ -73,7 +91,7 @@ public class UI_Animator : MonoBehaviour
 
         while (time < duration)
         {
-            rectTransform.localScale = Vector3.Lerp (initialScale, targetScale, time / duration);
+            rectTransform.localScale = Vector3.Lerp(initialScale, targetScale, time / duration);
             time += Time.unscaledDeltaTime;
             yield return null;
         }

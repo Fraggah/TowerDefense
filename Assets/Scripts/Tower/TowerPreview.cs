@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -12,18 +14,19 @@ public class TowerPreview : MonoBehaviour
     private void Awake()
     {
         attackRadiusDisplay = transform.AddComponent<TowerAttackRadiusDisplay>();
-        myTower = GetComponent<Tower>();
         meshRenderers = GetComponentsInChildren<MeshRenderer>();
+
+        myTower = GetComponent<Tower>();
         attackRange = myTower.GetAttackRange();
 
-        MakeAllMeshTransparent();
+        MakeAllMeshTransperent();
         DestroyExtraComponents();
     }
 
     public void ShowPreview(bool showPreview, Vector3 previewPosition)
     {
         transform.position = previewPosition;
-        attackRadiusDisplay.CreateCircle(showPreview, attackRange);
+        attackRadiusDisplay.CreateCircle(showPreview,attackRange);
     }
 
     private void DestroyExtraComponents()
@@ -37,9 +40,9 @@ public class TowerPreview : MonoBehaviour
         }
     }
 
-    private void MakeAllMeshTransparent()
+    private void MakeAllMeshTransperent()
     {
-        Material previewMat = FindAnyObjectByType<BuildManager>().GetBuildPreviewMat();
+        Material previewMat = FindFirstObjectByType<BuildManager>().GetBuildPreviewMat();
 
         foreach (var mesh in meshRenderers)
         {

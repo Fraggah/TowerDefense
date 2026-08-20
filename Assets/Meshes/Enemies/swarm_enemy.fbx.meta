@@ -3,7 +3,22 @@ guid: 35f2ec807c5eb3f4d98c8987e2aad73c
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TD_main_texture_palette
+    second: {fileID: 2100000, guid: d8115d715ec56be409567dea2d618ae5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: green_emission
+    second: {fileID: 2100000, guid: 798b3750abd9a374c82e4aafe168791f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: red_emission
+    second: {fileID: 2100000, guid: 3e5adbdb90bc0e54aa824749b2ad8525, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -32,7 +47,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 1
+    isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1

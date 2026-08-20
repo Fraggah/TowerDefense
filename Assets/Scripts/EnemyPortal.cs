@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,12 +23,10 @@ public class EnemyPortal : MonoBehaviour
     private void Update()
     {
         if (CanMakeNewEnemy())
-        {
             CreateEnemy();
-        }
     }
 
-    public void AssingWaveManager(WaveManager newWaveManager) => myWaveManager = newWaveManager;
+    public void AssignWaveManager(WaveManager newWaveManager) => myWaveManager = newWaveManager;
 
     private bool CanMakeNewEnemy()
     {
@@ -41,6 +40,7 @@ public class EnemyPortal : MonoBehaviour
 
         return false;
     }
+
 
     private void CreateEnemy()
     {
@@ -64,31 +64,28 @@ public class EnemyPortal : MonoBehaviour
     }
 
     public void AddEnemy(GameObject enemyToAdd) => enemiesToCreate.Add(enemyToAdd);
-  
     public void RemoveActiveEnemy(GameObject enemyToRemove)
     {
-        if (activeEnemies.Contains(enemyToRemove))
-        {
+        if(activeEnemies.Contains(enemyToRemove))
             activeEnemies.Remove(enemyToRemove);
-        }
 
         myWaveManager.CheckIfWaveCompleted();
     }
+
     public List<GameObject> GetActiveEnemies() => activeEnemies;
 
-    [ContextMenu("Collect Waypoints")]
+
+    [ContextMenu("Collect waypoints")]
     private void CollectWaypoints()
     {
-        waypointList = new List<Waypoint>();
+        waypointList = new List<Waypoint>(); 
 
         foreach (Transform child in transform)
         {
             Waypoint waypoint = child.GetComponent<Waypoint>();
 
             if(waypoint != null)
-            {
                 waypointList.Add(waypoint);
-            }
         }
     }
 }

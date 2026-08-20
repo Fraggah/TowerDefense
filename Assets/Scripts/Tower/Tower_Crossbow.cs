@@ -24,10 +24,10 @@ public class Tower_Crossbow : Tower
 
         if (Physics.Raycast(gunPoint.position, directionToEnemy, out RaycastHit hitInfo, Mathf.Infinity))
         {
-
             towerHead.forward = directionToEnemy;
 
             Enemy enemyTarget = null;
+
             IDamagable damagable = hitInfo.transform.GetComponent<IDamagable>();
 
             if (damagable != null)
@@ -36,9 +36,9 @@ public class Tower_Crossbow : Tower
                 enemyTarget = currentEnemy;
             }
 
-            visuals.PlayAttackVFX(gunPoint.position, hitInfo.point, enemyTarget);
-            visuals.PlayReloadVFX(attackCooldown);
 
+            visuals.PlayAttackVFX(gunPoint.position, hitInfo.point,enemyTarget);
+            visuals.PlayReloaxVFX(attackCooldown);
         }
     }
 }

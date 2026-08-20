@@ -1,9 +1,10 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class UI_BuildButtonOnHoverEffect : MonoBehaviour
 {
-    [SerializeField] private float adjustmentSpeed = 10;
+    [SerializeField] private float adjustmnetSpeed = 10;
 
     [SerializeField] private float showcaseY;
     [SerializeField] private float defaultY;
@@ -13,20 +14,19 @@ public class UI_BuildButtonOnHoverEffect : MonoBehaviour
 
     private void Update()
     {
-        if(Mathf.Abs(transform.position.y - targetY) > .01f && canMove)
+        if (Mathf.Abs(transform.position.y - targetY) > .01f && canMove)
         {
-            float newPositionY = Mathf.Lerp(transform.position.y, targetY, adjustmentSpeed * Time.deltaTime);
-
+            float newPositionY = Mathf.Lerp(transform.position.y, targetY, adjustmnetSpeed * Time.deltaTime);
             transform.position = new Vector3(transform.position.x, newPositionY, transform.position.z);
         }
     }
 
-    public void ToggleMovement(bool buttonMenuActive)
+    public void ToggleMovement(bool buttonsMenuActive)
     {
-        canMove = buttonMenuActive;
+        canMove = buttonsMenuActive;
         SetTargetY(defaultY);
 
-        if (buttonMenuActive == false)
+        if (buttonsMenuActive == false)
             SetPositionToDefault();
     }
 
@@ -37,11 +37,11 @@ public class UI_BuildButtonOnHoverEffect : MonoBehaviour
 
     private void SetTargetY(float newY) => targetY = newY;
 
-    public void ShowCaseButton(bool showcase)
+    public void ShowcaseButton(bool showcase)
     {
         if (showcase)
             SetTargetY(showcaseY);
-        else 
+        else
             SetTargetY(defaultY);
     }
 }

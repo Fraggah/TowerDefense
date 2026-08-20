@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class UI_Pause : MonoBehaviour
@@ -5,7 +7,7 @@ public class UI_Pause : MonoBehaviour
     private UI ui;
     private UI_InGame inGameUI;
 
-    [SerializeField] private GameObject[] pauseUIElements;
+    [SerializeField] private GameObject[] pauseUiElements;
 
     private void Awake()
     {
@@ -21,7 +23,7 @@ public class UI_Pause : MonoBehaviour
 
     public void SwitchPauseUIElements(GameObject elementToEnable)
     {
-        foreach (GameObject obj in pauseUIElements)
+        foreach (GameObject obj in pauseUiElements)
         {
             obj.SetActive(false);
         }

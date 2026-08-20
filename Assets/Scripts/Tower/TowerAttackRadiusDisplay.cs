@@ -1,29 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent (typeof(LineRenderer))]
+[RequireComponent(typeof(LineRenderer))]
 public class TowerAttackRadiusDisplay : MonoBehaviour
-{
+{ 
     private LineRenderer lineRenderer;
 
-    [SerializeField] private float radius;
     [SerializeField] private float lineWidth = .1f;
+    [SerializeField] private float radius;
     private int segments = 50;
 
     private void Awake()
     {
-        lineRenderer = GetComponent<LineRenderer> ();
-        lineRenderer.positionCount = segments + 1;
+        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = segments + 1; // We add extra point, so we can close the circle. 
         lineRenderer.useWorldSpace = true;
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
-        lineRenderer.material = FindAnyObjectByType<BuildManager>().GetAttackRadiusMat();
+        lineRenderer.material = FindFirstObjectByType<BuildManager>().GetAttackRadiusMat();
     }
 
+    
     public void CreateCircle(bool showCircle, float radius = 0)
     {
         lineRenderer.enabled = showCircle;
 
-        if (showCircle == false) return;
+        if (showCircle == false)
+            return;
 
         float angle = 0;
         Vector3 center = transform.position;
@@ -38,5 +42,5 @@ public class TowerAttackRadiusDisplay : MonoBehaviour
         }
 
         lineRenderer.SetPosition(segments, lineRenderer.GetPosition(0));
-    }
+    } 
 }

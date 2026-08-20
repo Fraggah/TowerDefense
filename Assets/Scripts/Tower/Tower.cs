@@ -21,12 +21,13 @@ public class Tower : MonoBehaviour
     [Tooltip("Enabling this allows tower to change target beetwen attacks")]
     [SerializeField] private bool dynamicTargetChange;
     private float targetCheckInterval = .1f;
-    private float lastTimeChechedTarget;
+    private float lastTimeCheckedTarget;
 
     protected virtual void Awake()
     {
         EnableRotation(true);
     }
+
 
     protected virtual void Update()
     {
@@ -38,7 +39,8 @@ public class Tower : MonoBehaviour
             return;
         }
 
-        if (CanAttack()) Attack();
+        if (CanAttack())
+            Attack();
 
         LooseTargetIfNeeded();
         RotateTowardsEnemy();
@@ -48,25 +50,24 @@ public class Tower : MonoBehaviour
     private void LooseTargetIfNeeded()
     {
         if (Vector3.Distance(currentEnemy.CenterPoint(), transform.position) > attackRange)
-        {
             currentEnemy = null;
-        }
     }
 
     private void UpdateTargetIfNeeded()
     {
-        if (dynamicTargetChange == false) return;
+        if (dynamicTargetChange == false)
+            return;
 
-        if (Time.time > lastTimeChechedTarget + targetCheckInterval)
+        if (Time.time > lastTimeCheckedTarget + targetCheckInterval)
         {
-            lastTimeChechedTarget = Time.time;
+            lastTimeCheckedTarget = Time.time;
             currentEnemy = FindEnemyWithinRange();
         }
     }
 
     protected virtual void Attack()
     {
-
+        //Debug.Log("Attack performed at " + Time.time);
     }
 
     protected bool CanAttack()
@@ -98,8 +99,12 @@ public class Tower : MonoBehaviour
                 possibleTargets.Add(newEnemy);
         }
 
-        if (priorityTargets.Count > 0) return GetMostAdvancedEnemy(priorityTargets);
-        if (possibleTargets.Count > 0) return GetMostAdvancedEnemy(possibleTargets);
+        if (priorityTargets.Count > 0)
+            return GetMostAdvancedEnemy(priorityTargets);
+
+        if (possibleTargets.Count > 0)
+            return GetMostAdvancedEnemy(possibleTargets);
+
         return null;
     }
 
@@ -110,7 +115,7 @@ public class Tower : MonoBehaviour
 
         foreach (Enemy enemy in targets)
         {
-            float remainingDistance = enemy.DistanceToTheFinishLine();
+            float remainingDistance = enemy.DistanceToFinishLine();
 
             if (remainingDistance < minRemainingDistance)
             {
@@ -118,6 +123,7 @@ public class Tower : MonoBehaviour
                 mostAdvancedEnemy = enemy;
             }
         }
+
         return mostAdvancedEnemy;
     }
 
@@ -128,15 +134,23 @@ public class Tower : MonoBehaviour
 
     protected virtual void RotateTowardsEnemy()
     {
-        if (!canRotate) return;
-        if (currentEnemy == null) return;
+        if (canRotate == false)
+            return;
 
+        if (currentEnemy == null)
+            return;
+
+        // Calculate the vector direction from the tower's head to the current enemy.
         Vector3 directionToEnemy = DirectionToEnemyFrom(towerHead);
 
+        // Create a Quaternion for the rotation towards the enemy, based on the direction vector.
         Quaternion lookRotation = Quaternion.LookRotation(directionToEnemy);
 
+        // Interpolate smoothly between the current rotation of the tower's head and the desired look rotation.
+        // 'rotationSpeed * Time.deltaTime' adjusts the speed of rotation to be frame-rate independent.
         Vector3 rotation = Quaternion.Lerp(towerHead.rotation, lookRotation, rotationSpeed * Time.deltaTime).eulerAngles;
 
+        // Apply the interpolated rotation back to the tower's head. This step converts the Quaternion back to Euler angles for straightforward application.
         towerHead.rotation = Quaternion.Euler(rotation);
     }
 
@@ -144,6 +158,7 @@ public class Tower : MonoBehaviour
     {
         return (currentEnemy.CenterPoint() - startPoint.position).normalized;
     }
+
 
     protected virtual void OnDrawGizmos()
     {
