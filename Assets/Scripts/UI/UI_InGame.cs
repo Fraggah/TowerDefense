@@ -71,7 +71,7 @@ public class UI_InGame : MonoBehaviour
 
     public void UpdateCurrencyUI(int value)
     {
-        currencyText.text = "resources : " + value;
+        currencyText.text = "Scrap : " + value;
     }
 
     public void UpdateWaveTimerUI(float value) => waveTimerText.text = "seconds : " + value.ToString("00");
