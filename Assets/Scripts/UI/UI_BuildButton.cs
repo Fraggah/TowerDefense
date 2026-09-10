@@ -24,7 +24,6 @@ public class UI_BuildButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField] private TextMeshProUGUI towerPriceText;
 
 
-    //It is used to preview tower before building it
     public TowerPreview towerPreview;
     public bool buttonUnlocked { get; private set; }
 

@@ -51,10 +51,8 @@ public class Enemy : MonoBehaviour , IDamagable
     {
         FaceTarget(agent.steeringTarget);
 
-        // Check if the agent is close to current target point
         if (ShouldChangeWaypoint())
         {
-            // Set the destination to the next waypoint
             agent.SetDestination(GetNextWaypoint());
         }
     }
@@ -91,9 +89,8 @@ public class Enemy : MonoBehaviour , IDamagable
 
     private void FaceTarget(Vector3 newTarget)
     {
-        // Calculate the direction from current position to the new target
         Vector3 directionToTarget = newTarget - transform.position;
-        directionToTarget.y = 0; // Ignore any diffrence in the vertical position // Removes vertical component
+        directionToTarget.y = 0;
 
         Quaternion newRotation = Quaternion.LookRotation(directionToTarget);
 
@@ -102,31 +99,23 @@ public class Enemy : MonoBehaviour , IDamagable
 
     private Vector3 GetNextWaypoint()
     {
-        // Check if the waypoint index is beyond the last waypoint
         if (nextWaypointIndex >= myWaypoints.Count)
         {
-            // If true, return the agent's current position, effectively stopping it
-            // Uncomment the line below to loop the waypoints
             // waypointIndex = 0;
             return transform.position;
         }
 
-        // Get the current target point from the waypoints array
         Vector3 targetPoint = myWaypoints[nextWaypointIndex].position;
 
-        // If this is not the first waypoint, calculate the distance from the previous waypoint
         if (nextWaypointIndex > 0)
         {
             float distance = Vector3.Distance(myWaypoints[nextWaypointIndex].position, myWaypoints[nextWaypointIndex - 1].position);
-            // Subtract this distance from the total distance
             totalDistance = totalDistance - distance;
         }
 
-        // Increment the waypoint index to move to the next waypoint on the next call
         nextWaypointIndex = nextWaypointIndex + 1;
-        currentWaypointIndex = nextWaypointIndex - 1; // Assign current waypoint index
+        currentWaypointIndex = nextWaypointIndex - 1;
 
-        // Return the current target point
         return targetPoint;
     }
 

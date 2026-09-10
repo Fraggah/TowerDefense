@@ -67,7 +67,7 @@ public class Tower : MonoBehaviour
 
     protected virtual void Attack()
     {
-        //Debug.Log("Attack performed at " + Time.time);
+        //Debug.Log("ataque " + Time.time);
     }
 
     protected bool CanAttack()
@@ -140,17 +140,10 @@ public class Tower : MonoBehaviour
         if (currentEnemy == null)
             return;
 
-        // Calculate the vector direction from the tower's head to the current enemy.
         Vector3 directionToEnemy = DirectionToEnemyFrom(towerHead);
-
-        // Create a Quaternion for the rotation towards the enemy, based on the direction vector.
         Quaternion lookRotation = Quaternion.LookRotation(directionToEnemy);
-
-        // Interpolate smoothly between the current rotation of the tower's head and the desired look rotation.
-        // 'rotationSpeed * Time.deltaTime' adjusts the speed of rotation to be frame-rate independent.
         Vector3 rotation = Quaternion.Lerp(towerHead.rotation, lookRotation, rotationSpeed * Time.deltaTime).eulerAngles;
 
-        // Apply the interpolated rotation back to the tower's head. This step converts the Quaternion back to Euler angles for straightforward application.
         towerHead.rotation = Quaternion.Euler(rotation);
     }
 

@@ -227,7 +227,6 @@ public class WaveManager : MonoBehaviour
     {
         if (waveIndex >= levelWaves.Length)
         {
-            // Check if all waves are completed; return null if no more waves are available
             return null;
         }
 

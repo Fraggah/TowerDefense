@@ -14,7 +14,7 @@ public class TowerAttackRadiusDisplay : MonoBehaviour
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.positionCount = segments + 1; // We add extra point, so we can close the circle. 
+        lineRenderer.positionCount = segments + 1;
         lineRenderer.useWorldSpace = true;
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;

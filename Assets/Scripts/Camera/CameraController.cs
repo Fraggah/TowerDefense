@@ -89,7 +89,7 @@ public class CameraController : MonoBehaviour
 
     private void HandleRotation()
     {
-        if (Input.GetMouseButton(1)) // Right mouse button for rotation
+        if (Input.GetMouseButton(1))//c izquierdo
         {
             float horizontalRotation = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
             float verticalRotation = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;

@@ -127,10 +127,8 @@ public class Crossbow_Visuals : MonoBehaviour
         float startTime = Time.time; 
         float startIntensity = 0;
 
-        // Do something repeatedly until the duration has passed
         while (Time.time - startTime < duration) 
         {
-            // Calculates the proportion of the duration that has elapsed since the start of the coroutine.
             float tValue = (Time.time - startTime) / duration;
             currentIntensity = Mathf.Lerp(startIntensity, maxIntensity, tValue);
             yield return null;
