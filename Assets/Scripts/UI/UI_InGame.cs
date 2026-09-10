@@ -66,7 +66,7 @@ public class UI_InGame : MonoBehaviour
     public void UpdateHealthPointsUI(int value, int maxValue)
     {
         int newValue = maxValue - value;
-        healthPointsText.text = "Threat : " + newValue + "/" + maxValue;
+        healthPointsText.text = "Castle : " + newValue;
     }
 
     public void UpdateCurrencyUI(int value)
